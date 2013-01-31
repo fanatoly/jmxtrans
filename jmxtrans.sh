@@ -45,6 +45,16 @@ if [ $? != 0 ]; then
 	exit 1
 fi
 
+run() {
+	if [ -z "$FILENAME" ]; then
+		EXEC=${EXEC:-"-jar $JAR_FILE -e -j $JSON_DIR -s $SECONDS_BETWEEN_RUNS"}
+	else
+		EXEC=${EXEC:-"-jar $JAR_FILE -e -f $FILENAME -s $SECONDS_BETWEEN_RUNS"}
+	fi
+
+	$JAVA -server $JAVA_OPTS $JMXTRANS_OPTS $GC_OPTS $MONITOR_OPTS $EXEC 2>&1 
+}
+
 start() {
 	if [ ! -z "$PIDFILE" ]; then
 		if [ -r "$PIDFILE" ]; then
@@ -139,8 +149,11 @@ case $1 in
 	status)
 		status
 	;;
+	run)
+		run
+	;;
 	*)
-		echo $"Usage: $0 {start|stop|restart|status} [filename.json]"
+		echo $"Usage: $0 {run|start|stop|restart|status} [filename.json]"
 	;;
 esac
 
